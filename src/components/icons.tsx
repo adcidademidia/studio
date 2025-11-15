@@ -1,0 +1,39 @@
+export function Logo(props: React.SVGProps<SVGSVGElement>) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 256 256"
+            {...props}
+        >
+            <rect width="256" height="256" fill="none" />
+            <path
+                d="M40,128a88,88,0,0,1,88-88"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="24"
+            />
+            <path
+                d="M216,128a88,88,0,0,1-88,88"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="24"
+            />
+            <rect
+                x="40"
+                y="40"
+                width="176"
+                height="176"
+                rx="8"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="24"
+            />
+        </svg>
+    );
+}

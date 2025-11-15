@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "theme-bg-1",
+      "description": "Abstract blue and orange background",
+      "imageUrl": "https://images.unsplash.com/photo-1663970206579-c157cba7edda?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzYzMTMyOTA1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract background"
+    },
+    {
+      "id": "theme-bg-2",
+      "description": "Geometric pattern background",
+      "imageUrl": "https://images.unsplash.com/photo-1572756317709-fe9c15ced298?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxnZW9tZXRyaWMlMjBwYXR0ZXJufGVufDB8fHx8MTc2MzE5MTUxOXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "geometric pattern"
+    },
+    {
+      "id": "theme-bg-3",
+      "description": "Vibrant gradient background",
+      "imageUrl": "https://images.unsplash.com/photo-1750727548671-6e157cef2692?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx2aWJyYW50JTIwZ3JhZGllbnR8ZW58MHx8fHwxNzYzMDk3MTAyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "vibrant gradient"
+    },
+    {
+      "id": "theme-bg-4",
+      "description": "Dark tech background",
+      "imageUrl": "https://images.unsplash.com/photo-1663895064411-fff0ab8a9797?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx0ZWNoJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3NjMxOTIyNDJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tech background"
+    }
+  ]
 }
