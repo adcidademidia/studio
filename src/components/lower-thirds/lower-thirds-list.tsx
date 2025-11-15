@@ -7,7 +7,6 @@ interface LowerThirdsListProps {
   onDelete: (id: string) => void;
   onUpdate: (item: LowerThird) => void;
   onMove: (id: string, direction: "up" | "down") => void;
-  activeTheme?: Theme;
 }
 
 export function LowerThirdsList({
@@ -15,7 +14,6 @@ export function LowerThirdsList({
   onDelete,
   onUpdate,
   onMove,
-  activeTheme,
 }: LowerThirdsListProps) {
   if (items.length === 0) {
     return (
@@ -51,7 +49,6 @@ export function LowerThirdsList({
                 onDelete={onDelete}
                 onUpdate={onUpdate}
                 onMove={onMove}
-                activeTheme={activeTheme}
               />
             </div>
           ))}

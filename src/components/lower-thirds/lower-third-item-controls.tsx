@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from 'react'
-import { doc, deleteDoc } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
 import { ArrowDown, ArrowUp, Edit, Eye, EyeOff, Trash2 } from "lucide-react";
 import { ACTIVE_LOWER_THIRD_ID } from "@/lib/constants";
 import type { ActiveData, LowerThird, Theme } from "@/lib/types";
@@ -19,6 +19,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useDoc, useFirestore, useMemoFirebase, setDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase';
+import { useAppStore } from '@/hooks/use-app-store';
 
 interface LowerThirdItemControlsProps {
   item: LowerThird;
@@ -27,7 +28,6 @@ interface LowerThirdItemControlsProps {
   onDelete: (id: string) => void;
   onUpdate: (item: LowerThird) => void;
   onMove: (id: string, direction: 'up' | 'down') => void;
-  activeTheme?: Theme;
 }
 
 export function LowerThirdItemControls({
@@ -37,10 +37,11 @@ export function LowerThirdItemControls({
   onDelete,
   onUpdate,
   onMove,
-  activeTheme,
 }: LowerThirdItemControlsProps) {
   const firestore = useFirestore();
   const [editOpen, setEditOpen] = React.useState(false);
+  const { getActiveTheme } = useAppStore();
+  const activeTheme = getActiveTheme();
 
   const activeStateRef = useMemoFirebase(
     () => firestore ? doc(firestore, 'activeState', ACTIVE_LOWER_THIRD_ID) : null,

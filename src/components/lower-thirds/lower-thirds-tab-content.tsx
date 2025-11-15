@@ -10,10 +10,9 @@ interface LowerThirdsTabContentProps {
 }
 
 export function LowerThirdsTabContent({ type, actions }: LowerThirdsTabContentProps) {
-  const { lowerThirds, removeLowerThird, updateLowerThird, moveLowerThird, getActiveTheme } = useAppStore();
+  const { lowerThirds, removeLowerThird, updateLowerThird, moveLowerThird } = useAppStore();
   
   const items = lowerThirds.filter((item) => item.type === type);
-  const activeTheme = getActiveTheme();
 
   return (
     <div className="space-y-4">
@@ -23,7 +22,6 @@ export function LowerThirdsTabContent({ type, actions }: LowerThirdsTabContentPr
         onDelete={removeLowerThird}
         onUpdate={updateLowerThird}
         onMove={moveLowerThird}
-        activeTheme={activeTheme}
       />
     </div>
   );
