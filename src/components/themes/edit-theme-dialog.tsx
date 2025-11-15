@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect } from "react";
@@ -38,7 +39,7 @@ const themeSchema = z.object({
   titleColor: z.string().regex(/^#([0-9a-f]{3}){1,2}$/i, "Must be a valid hex color."),
   subtitleColor: z.string().regex(/^#([0-9a-f]{3}){1,2}$/i, "Must be a valid hex color."),
   backgroundColor: z.string(), // Can be any CSS color
-  backgroundImageUrl: z.string().url("Must be a valid URL.").or(z.literal("")),
+  backgroundImageUrl: z.string().url("Must be a valid URL.").or(z.literal("")).optional(),
 });
 
 type EditThemeDialogProps = {
@@ -84,10 +85,15 @@ export function EditThemeDialog({ open, onOpenChange, themeId }: EditThemeDialog
   }, [open, isEditing, theme, form]);
 
   const onSubmit = (values: z.infer<typeof themeSchema>) => {
+    const submissionValues = {
+        ...values,
+        backgroundImageUrl: values.backgroundImageUrl === 'none' ? '' : values.backgroundImageUrl,
+    };
+
     if (isEditing && theme) {
-      updateTheme({ ...theme, ...values });
+      updateTheme({ ...theme, ...submissionValues });
     } else {
-      addTheme(values);
+      addTheme(submissionValues);
     }
     onOpenChange(false);
   };
@@ -163,14 +169,14 @@ export function EditThemeDialog({ open, onOpenChange, themeId }: EditThemeDialog
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Background Image</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value || "none"}>
                         <FormControl>
                         <SelectTrigger>
                             <SelectValue placeholder="Select a background or leave empty" />
                         </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                            <SelectItem value="">None</SelectItem>
+                            <SelectItem value="none">None</SelectItem>
                             {PlaceHolderImages.map(img => (
                                 <SelectItem key={img.id} value={img.imageUrl}>{img.description}</SelectItem>
                             ))}
