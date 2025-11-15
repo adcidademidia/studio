@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "../ui/label";
+import { Label } from "@/components/ui/label";
 
 const themeSchema = z.object({
   name: z.string().min(1, "Theme name is required."),
@@ -65,9 +65,21 @@ export function EditThemeDialog({ open, onOpenChange, themeId }: EditThemeDialog
 
   useEffect(() => {
     if (open && isEditing && theme) {
-      form.reset(theme);
+      form.reset({
+        name: theme.name,
+        titleColor: theme.titleColor,
+        subtitleColor: theme.subtitleColor,
+        backgroundColor: theme.backgroundColor,
+        backgroundImageUrl: theme.backgroundImageUrl || "",
+      });
     } else if (open && !isEditing) {
-      form.reset();
+      form.reset({
+        name: "",
+        titleColor: "#FFFFFF",
+        subtitleColor: "#CCCCCC",
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        backgroundImageUrl: "",
+      });
     }
   }, [open, isEditing, theme, form]);
 

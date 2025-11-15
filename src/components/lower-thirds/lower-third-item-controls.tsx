@@ -1,9 +1,10 @@
 "use client";
 
 import * as React from 'react'
+import { doc, deleteDoc } from 'firebase/firestore';
 import { ArrowDown, ArrowUp, Edit, Eye, EyeOff, Trash2 } from "lucide-react";
-import { ACTIVE_LOWER_THIRD_STORAGE_KEY } from "@/lib/constants";
-import type { LowerThird, Theme } from "@/lib/types";
+import { ACTIVE_LOWER_THIRD_ID } from "@/lib/constants";
+import type { ActiveData, LowerThird, Theme } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { EditLowerThirdDialog } from "./edit-lower-third-dialog";
 import {
@@ -17,6 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { useDoc, useFirestore, useMemoFirebase, setDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase';
 
 interface LowerThirdItemControlsProps {
   item: LowerThird;
@@ -37,44 +39,30 @@ export function LowerThirdItemControls({
   onMove,
   activeTheme,
 }: LowerThirdItemControlsProps) {
+  const firestore = useFirestore();
   const [editOpen, setEditOpen] = React.useState(false);
-  const [isActive, setIsActive] = React.useState(false);
 
-  React.useEffect(() => {
-    const checkActive = () => {
-        const activeItemRaw = localStorage.getItem(ACTIVE_LOWER_THIRD_STORAGE_KEY);
-        if (activeItemRaw) {
-            const activeItem = JSON.parse(activeItemRaw);
-            setIsActive(activeItem?.lowerThird?.id === item.id);
-        } else {
-            setIsActive(false);
-        }
-    };
-    checkActive();
-    window.addEventListener('storage', checkActive);
-    return () => window.removeEventListener('storage', checkActive);
-  }, [item.id])
+  const activeStateRef = useMemoFirebase(
+    () => firestore ? doc(firestore, 'activeState', ACTIVE_LOWER_THIRD_ID) : null,
+    [firestore]
+  );
+  const { data: activeData } = useDoc<ActiveData>(activeStateRef);
+
+  const isActive = activeData?.lowerThird?.id === item.id;
 
   const handleShow = () => {
-    if (activeTheme) {
-      const dataToStore = JSON.stringify({ lowerThird: item, theme: activeTheme });
-      localStorage.setItem(ACTIVE_LOWER_THIRD_STORAGE_KEY, dataToStore);
-      // Manually dispatch a storage event so this tab also updates
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: ACTIVE_LOWER_THIRD_STORAGE_KEY,
-        newValue: dataToStore,
-      }));
+    if (activeTheme && firestore && activeStateRef) {
+      const dataToStore: ActiveData = { lowerThird: item, theme: activeTheme };
+      setDocumentNonBlocking(activeStateRef, dataToStore, { merge: false });
     } else {
         alert("Please set an active theme first.");
     }
   };
 
   const handleHide = () => {
-    localStorage.removeItem(ACTIVE_LOWER_THIRD_STORAGE_KEY);
-     window.dispatchEvent(new StorageEvent('storage', {
-        key: ACTIVE_LOWER_THIRD_STORAGE_KEY,
-        newValue: null,
-      }));
+    if (firestore && activeStateRef) {
+      deleteDocumentNonBlocking(activeStateRef);
+    }
   }
 
   return (

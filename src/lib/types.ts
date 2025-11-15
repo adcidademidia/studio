@@ -13,3 +13,8 @@ export type Theme = {
   backgroundColor: string;
   backgroundImageUrl: string;
 };
+
+export type ActiveData = {
+  lowerThird: LowerThird;
+  theme: Theme;
+};

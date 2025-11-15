@@ -4,16 +4,7 @@
  * Core Philosophy:
  * This ruleset prioritizes a strict user-ownership model for private data nested under `/users/{userId}`.
  * Global configurations (themes, lower third configurations) are stored at the root level and may be publicly readable.
- *
- * Data Structure:
- * - `/users/{userId}`: Root for all user-specific data.
- * - `/users/{userId}/lowerThirdInstances/{instanceId}`: Instances of lower thirds, owned by the user.
- * - `/themes/{themeId}`: Globally available themes.
- * - `/lowerThirdConfigurations/{configurationId}`: Globally available configurations.
- *
- * Key Security Decisions:
- * - Strict user-ownership: Only the authenticated user can read, create, update, or delete data under their `/users/{userId}` path.
- * - Global configurations: Themes and configurations are publicly readable to allow StreamDeck to list the contents.
+ * The active state is stored in a separate collection and is publicly readable and writable for this simple use case.
  */
 rules_version = '2';
 service cloud.firestore {
@@ -27,49 +18,13 @@ service cloud.firestore {
     }
 
     /**
-     * @description Checks if the authenticated user ID matches the provided user ID.
+     * @description Rules for the /activeState/{docId} collection.
+     * @path /activeState/{docId}
+     * @allow (read, write) Any user can read or write the active state to allow real-time synchronization.
+     * @principle Public access for shared state.
      */
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    /**
-     * @description Checks if the authenticated user is the owner of an existing document.
-     */
-    function isExistingOwner(userId) {
-      return isOwner(userId) && resource != null;
-    }
-
-    /**
-     * @description Rules for the /users/{userId} collection.
-     * @path /users/{userId}
-     * @allow (create) User with UID 'user123' can create their own profile document if request.auth.uid == 'user123'.
-     * @deny (create) User with UID 'user456' cannot create a profile document for 'user123'.
-     * @principle Enforces user-ownership.
-     */
-    match /users/{userId} {
-      allow get: if false;
-      allow list: if false;
-
-      allow create: if isOwner(userId);
-      allow update: if false;
-      allow delete: if false;
-    }
-
-    /**
-     * @description Rules for the /users/{userId}/lowerThirdInstances/{instanceId} collection.
-     * @path /users/{userId}/lowerThirdInstances/{instanceId}
-     * @allow (create) User with UID 'user123' can create a lowerThirdInstance document under their own user ID.
-     * @deny (create) User with UID 'user456' cannot create a lowerThirdInstance document under 'user123'.
-     * @principle Enforces document ownership for writes.
-     */
-    match /users/{userId}/lowerThirdInstances/{instanceId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-
-      allow create: if isOwner(userId) && request.resource.data.id == instanceId;
-      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
-      allow delete: if isExistingOwner(userId);
+    match /activeState/{docId} {
+      allow read, write: if true;
     }
 
     /**

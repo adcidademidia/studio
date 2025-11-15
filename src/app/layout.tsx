@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import { AppStoreProvider } from '@/hooks/use-app-store';
 import { Toaster } from "@/components/ui/toaster"
 import './globals.css';
+import { FirebaseClientProvider } from '@/firebase';
 
 export const metadata: Metadata = {
   title: 'StreamDeck Lower Thirds',
@@ -22,10 +23,12 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <AppStoreProvider>
-          {children}
-          <Toaster />
-        </AppStoreProvider>
+        <FirebaseClientProvider>
+          <AppStoreProvider>
+            {children}
+            <Toaster />
+          </AppStoreProvider>
+        </FirebaseClientProvider>
       </body>
     </html>
   );

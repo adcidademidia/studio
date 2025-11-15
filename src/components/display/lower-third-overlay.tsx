@@ -2,68 +2,68 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { ACTIVE_LOWER_THIRD_STORAGE_KEY } from "@/lib/constants";
-import type { LowerThird, Theme } from "@/lib/types";
+import { doc } from 'firebase/firestore';
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import type { ActiveData } from "@/lib/types";
 import { cn } from "@/lib/utils";
-
-type ActiveData = {
-  lowerThird: LowerThird;
-  theme: Theme;
-};
+import { ACTIVE_LOWER_THIRD_ID } from "@/lib/constants";
 
 export function LowerThirdOverlay() {
-  const [activeData, setActiveData] = useState<ActiveData | null>(null);
+  const firestore = useFirestore();
+  const [prevActiveData, setPrevActiveData] = useState<ActiveData | null>(null);
+
+  const activeStateRef = useMemoFirebase(
+    () => firestore ? doc(firestore, 'activeState', ACTIVE_LOWER_THIRD_ID) : null,
+    [firestore]
+  );
+  const { data: activeData, isLoading } = useDoc<ActiveData>(activeStateRef);
+
   const [isVisible, setIsVisible] = useState(false);
   const [animationClass, setAnimationClass] = useState("");
-  
-  const handleStorageChange = () => {
-    const data = localStorage.getItem(ACTIVE_LOWER_THIRD_STORAGE_KEY);
-    const parsedData: ActiveData | null = data ? JSON.parse(data) : null;
-    
-    if (parsedData?.lowerThird?.id !== activeData?.lowerThird?.id) {
-       // If there's something visible, animate it out first
-       if(isVisible) {
-         setAnimationClass("animate-lower-third-out");
-         setTimeout(() => {
-           setActiveData(parsedData);
-           if (parsedData) {
-             setIsVisible(true);
-             setAnimationClass("animate-lower-third-in");
-           } else {
-             setIsVisible(false);
-           }
-         }, 500); // match out-animation duration
-       } else if (parsedData) {
-         // If nothing is visible, just animate in
-         setActiveData(parsedData);
-         setIsVisible(true);
-         setAnimationClass("animate-lower-third-in");
-       }
-    } else if (!parsedData) {
+
+  useEffect(() => {
+    const hasDataChanged = activeData?.lowerThird?.id !== prevActiveData?.lowerThird?.id;
+
+    if (isLoading) return;
+
+    if (hasDataChanged) {
+      if (isVisible) {
+        // Animate out the old one
+        setAnimationClass("animate-lower-third-out");
+        setTimeout(() => {
+          setPrevActiveData(activeData || null);
+          if (activeData) {
+            // Animate in the new one
+            setIsVisible(true);
+            setAnimationClass("animate-lower-third-in");
+          } else {
+            setIsVisible(false);
+          }
+        }, 500); // match out-animation duration
+      } else if (activeData) {
+        // Nothing is visible, just animate in the new one
+        setPrevActiveData(activeData);
+        setIsVisible(true);
+        setAnimationClass("animate-lower-third-in");
+      }
+    } else if (!activeData && isVisible) {
       // Handle hiding the lower third
       setAnimationClass("animate-lower-third-out");
       setTimeout(() => {
-          setIsVisible(false);
-          setActiveData(null);
+        setIsVisible(false);
+        setPrevActiveData(null);
       }, 500);
     }
-  };
+  }, [activeData, prevActiveData, isVisible, isLoading]);
 
-  useEffect(() => {
-    // Initial load
-    handleStorageChange();
-    
-    window.addEventListener("storage", handleStorageChange);
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []); // Run only on mount and unmount
 
-  if (!activeData || !isVisible) {
+  const displayData = isVisible ? prevActiveData : null;
+
+  if (!displayData) {
     return null;
   }
 
-  const { lowerThird, theme } = activeData;
+  const { lowerThird, theme } = displayData;
 
   return (
     <div

@@ -14,9 +14,13 @@
           "type": "string",
           "description": "The name of the theme."
         },
-        "textColor": {
+        "titleColor": {
           "type": "string",
-          "description": "The text color for the lower third."
+          "description": "The text color for the title."
+        },
+        "subtitleColor": {
+          "type": "string",
+          "description": "The text color for the subtitle."
         },
         "backgroundColor": {
           "type": "string",
@@ -31,84 +35,49 @@
       "required": [
         "id",
         "name",
-        "textColor",
+        "titleColor",
+        "subtitleColor",
         "backgroundColor"
       ]
     },
-    "LowerThirdConfiguration": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "LowerThirdConfiguration",
+    "LowerThird": {
+      "title": "LowerThird",
       "type": "object",
-      "description": "Represents the configuration for a lower third, including music and people sections.",
+      "description": "Represents a lower third with a title and subtitle.",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique identifier for the LowerThirdConfiguration entity."
+          "type": "string"
         },
-        "name": {
+        "type": {
           "type": "string",
-          "description": "The name of the configuration."
-        },
-        "musicItems": {
-          "type": "array",
-          "description": "List of music items in the configuration.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "peopleItems": {
-          "type": "array",
-          "description": "List of people items in the configuration.",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "musicItems",
-        "peopleItems"
-      ]
-    },
-    "LowerThirdInstance": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "LowerThirdInstance",
-      "type": "object",
-      "description": "Represents a specific instance of a lower third, storing the title, subtitle, theme, and target display computer.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the LowerThirdInstance entity."
+          "enum": [
+            "person",
+            "music"
+          ]
         },
         "title": {
-          "type": "string",
-          "description": "The title text for the lower third."
+          "type": "string"
         },
         "subtitle": {
-          "type": "string",
-          "description": "The subtitle text for the lower third."
+          "type": "string"
+        }
+      }
+    },
+    "ActiveLowerThird": {
+      "title": "ActiveLowerThird",
+      "type": "object",
+      "description": "Represents the currently active lower third and its theme.",
+      "properties": {
+        "lowerThird": {
+          "$ref": "#/entities/LowerThird"
         },
-        "themeId": {
-          "type": "string",
-          "description": "Reference to Theme. (Relationship: Theme 1:N LowerThirdInstance)"
-        },
-        "targetComputer": {
-          "type": "string",
-          "description": "The identifier for the computer where the lower third should be displayed."
-        },
-        "configurationId": {
-          "type": "string",
-          "description": "Reference to LowerThirdConfiguration. (Relationship: LowerThirdConfiguration 1:N LowerThirdInstance)"
+        "theme": {
+          "$ref": "#/entities/Theme"
         }
       },
       "required": [
-        "id",
-        "title",
-        "subtitle",
-        "themeId",
-        "targetComputer",
-        "configurationId"
+        "lowerThird",
+        "theme"
       ]
     }
   },
@@ -121,74 +90,21 @@
   "firestore": {
     "structure": [
       {
-        "path": "/users/{userId}",
+        "path": "/activeState/{docId}",
         "definition": {
-          "entityName": "user",
+          "entityName": "ActiveLowerThird",
           "schema": {
-            "$ref": "#/backend/entities/User"
+            "$ref": "#/entities/ActiveLowerThird"
           },
-          "description": "Collection to store user-related data. Serves as an anchor for user-owned subcollections.",
+          "description": "Stores the currently active lower third to be displayed. A single document with a fixed ID like 'main' will be used.",
           "params": [
             {
-              "name": "userId",
-              "description": "The unique identifier for the user."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/lowerThirdInstances/{instanceId}",
-        "definition": {
-          "entityName": "LowerThirdInstance",
-          "schema": {
-            "$ref": "#/backend/entities/LowerThirdInstance"
-          },
-          "description": "Stores instances of lower thirds configurations specific to a user.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user."
-            },
-            {
-              "name": "instanceId",
-              "description": "The unique identifier for the lower third instance."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/themes/{themeId}",
-        "definition": {
-          "entityName": "Theme",
-          "schema": {
-            "$ref": "#/backend/entities/Theme"
-          },
-          "description": "Collection to store themes for lower thirds.",
-          "params": [
-            {
-              "name": "themeId",
-              "description": "The unique identifier for the theme."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/lowerThirdConfigurations/{configurationId}",
-        "definition": {
-          "entityName": "LowerThirdConfiguration",
-          "schema": {
-            "$ref": "#/backend/entities/LowerThirdConfiguration"
-          },
-          "description": "Collection to store configurations for lower thirds.",
-          "params": [
-            {
-              "name": "configurationId",
-              "description": "The unique identifier for the lower third configuration."
+              "name": "docId",
+              "description": "The document ID, typically a fixed value like 'main' or 'active'."
             }
           ]
         }
       }
-    ],
-    "reasoning": "The Firestore structure is designed to support the StreamDeck Lower Thirds application, focusing on simplicity, security, and scalability.  It provides clear separation of user-specific data and globally shared configurations to ensure efficient data retrieval and management. The data model emphasizes authorization independence through denormalization, avoiding complex hierarchical dependencies in security rules and enabling atomic operations. This architecture facilitates straightforward and robust security rules that are easy to debug. \n\nTo achieve authorization independence (CRITICAL), the structure relies on denormalization, copying relevant authorization context (like user IDs or role memberships) into subcollections. This eliminates the need for `get()` calls in security rules, simplifying rule logic and enabling atomic operations. Each collection is designed with a homogeneous security posture, meaning all documents within a collection share the same security requirements, further simplifying the rules.\n\nThe path-based ownership pattern (`/users/{userId}/...`) secures private user data. Global configurations (themes, configurations) are stored at the root level, as the user story does not describe sharing of global configuration between users or user-based access control. If sharing between users or orgs is required, a membership map should be implemented. \n\n**Authorization Independence:** There is no implicit authorization, it relies solely on `request.auth.uid` and existence checks or explicit fields in the database.\n\n**QAPs Support:**\n\n*   *Private User Data*: The `/users/{userId}` path segregation guarantees that listing `/users/{userId}/lowerThirdInstances` will only return data accessible to the specified user, as enforced by the path-based security rules.\n*   *Global Configurations*: Themes and configurations are placed at the root level with potentially public read access.\n\n"
+    ]
   }
 }
