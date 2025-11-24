@@ -26,9 +26,19 @@
           "type": "string",
           "description": "The background color for the lower third."
         },
-        "backgroundImageUrl": {
+        "backgroundLayer1": {
           "type": "string",
-          "description": "URL of the background image for the lower third.",
+          "description": "URL of the background image for the top layer.",
+          "format": "uri"
+        },
+        "backgroundLayer2": {
+          "type": "string",
+          "description": "URL of the background image for the middle layer.",
+          "format": "uri"
+        },
+        "backgroundLayer3": {
+          "type": "string",
+          "description": "URL of the background image for the bottom layer.",
           "format": "uri"
         }
       },

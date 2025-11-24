@@ -24,15 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+import { ImageUploader } from "./image-uploader";
 
 const themeSchema = z.object({
   name: z.string().min(1, "Theme name is required."),
@@ -95,9 +87,9 @@ export function EditThemeDialog({ open, onOpenChange, themeId }: EditThemeDialog
   const onSubmit = (values: z.infer<typeof themeSchema>) => {
     const submissionValues = {
         ...values,
-        backgroundLayer1: values.backgroundLayer1 === 'none' ? undefined : values.backgroundLayer1,
-        backgroundLayer2: values.backgroundLayer2 === 'none' ? undefined : values.backgroundLayer2,
-        backgroundLayer3: values.backgroundLayer3 === 'none' ? undefined : values.backgroundLayer3,
+        backgroundLayer1: values.backgroundLayer1 || undefined,
+        backgroundLayer2: values.backgroundLayer2 || undefined,
+        backgroundLayer3: values.backgroundLayer3 || undefined,
     };
 
     if (isEditing && theme) {
@@ -110,7 +102,7 @@ export function EditThemeDialog({ open, onOpenChange, themeId }: EditThemeDialog
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-headline">{isEditing ? "Edit Theme" : "Create New Theme"}</DialogTitle>
           <DialogDescription>
@@ -118,132 +110,111 @@ export function EditThemeDialog({ open, onOpenChange, themeId }: EditThemeDialog
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 py-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Theme Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., Sunday Service" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="titleColor"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title Color</FormLabel>
-                    <FormControl>
-                      <Input type="color" {...field} className="p-1"/>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="subtitleColor"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Subtitle Color</FormLabel>
-                    <FormControl>
-                      <Input type="color" {...field} className="p-1"/>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6 py-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                    <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Theme Name</FormLabel>
+                        <FormControl>
+                            <Input placeholder="e.g., Sunday Service" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                        control={form.control}
+                        name="titleColor"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Title Color</FormLabel>
+                            <FormControl>
+                            <Input type="color" {...field} className="p-1"/>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="subtitleColor"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Subtitle Color</FormLabel>
+                            <FormControl>
+                            <Input type="color" {...field} className="p-1"/>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    </div>
+                    <FormField
+                        control={form.control}
+                        name="backgroundColor"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Mask Background Color</FormLabel>
+                            <FormControl>
+                            <Input placeholder="rgba(0,0,0,0.5)" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                </div>
+                <div className="grid grid-cols-1 gap-4">
+                    <FormField
+                        control={form.control}
+                        name="backgroundLayer1"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Layer 1 (Top, Left)</FormLabel>
+                            <FormControl>
+                                <ImageUploader folder="themes/layer1" value={field.value} onChange={field.onChange} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                </div>
             </div>
-             <FormField
-                control={form.control}
-                name="backgroundColor"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mask Background Color</FormLabel>
-                    <FormControl>
-                       <Input placeholder="rgba(0,0,0,0.5)" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-             <FormField
-                control={form.control}
-                name="backgroundLayer1"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Layer 1 (Top, Left)</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || "none"}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <FormField
+                    control={form.control}
+                    name="backgroundLayer2"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Layer 2 (Middle, Right, Masked)</FormLabel>
                         <FormControl>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select an image" />
-                        </SelectTrigger>
+                             <ImageUploader folder="themes/layer2" value={field.value} onChange={field.onChange} />
                         </FormControl>
-                        <SelectContent>
-                            <SelectItem value="none">None</SelectItem>
-                            {PlaceHolderImages.map(img => (
-                                <SelectItem key={img.id} value={img.imageUrl}>{img.description}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="backgroundLayer2"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Layer 2 (Middle, Right, Masked)</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || "none"}>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="backgroundLayer3"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Layer 3 (Bottom, Left, Masked)</FormLabel>
                         <FormControl>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select an image" />
-                        </SelectTrigger>
+                            <ImageUploader folder="themes/layer3" value={field.value} onChange={field.onChange} />
                         </FormControl>
-                        <SelectContent>
-                            <SelectItem value="none">None</SelectItem>
-                            {PlaceHolderImages.map(img => (
-                                <SelectItem key={img.id} value={img.imageUrl}>{img.description}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="backgroundLayer3"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Layer 3 (Bottom, Left, Masked)</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || "none"}>
-                        <FormControl>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select an image" />
-                        </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                            <SelectItem value="none">None</SelectItem>
-                            {PlaceHolderImages.map(img => (
-                                <SelectItem key={img.id} value={img.imageUrl}>{img.description}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+            </div>
+            
             <DialogFooter className="mt-4">
+              <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
               <Button type="submit">{isEditing ? "Save Changes" : "Create Theme"}</Button>
             </DialogFooter>
           </form>
