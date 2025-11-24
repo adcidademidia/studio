@@ -8,7 +8,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="relative flex min-h-screen flex-col">
       <Header />
-      <main className="flex-1">
+      <main className="flex flex-1 items-center justify-center">
         <div className="container relative py-8">
             {children}
         </div>
