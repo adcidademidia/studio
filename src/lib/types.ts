@@ -11,7 +11,9 @@ export type Theme = {
   titleColor: string;
   subtitleColor: string;
   backgroundColor: string;
-  backgroundImageUrl: string;
+  backgroundLayer1?: string; // Image with highest z-index, left-aligned
+  backgroundLayer2?: string; // Image with mid z-index, right-aligned, masked
+  backgroundLayer3?: string; // Image with lowest z-index, left-aligned, masked
 };
 
 export type ActiveData = {

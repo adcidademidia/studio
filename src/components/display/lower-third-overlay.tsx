@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { doc } from 'firebase/firestore';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
@@ -19,35 +19,40 @@ export function LowerThirdOverlay() {
   const { data: activeData, isLoading } = useDoc<ActiveData>(activeStateRef);
 
   const [isVisible, setIsVisible] = useState(false);
-  const [animationClass, setAnimationClass] = useState("");
+  const [animationClass, setAnimationClass] = useState("opacity-0");
+
+  const [maskWidth, setMaskWidth] = useState(0);
+  const textContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const hasDataChanged = activeData?.lowerThird?.id !== prevActiveData?.lowerThird?.id;
+    if (textContentRef.current) {
+        // Calculate width of text content + padding and set mask width
+        const textWidth = textContentRef.current.scrollWidth;
+        setMaskWidth(textWidth);
+    }
+  }, [prevActiveData]); // Recalculate on data change
+
+  useEffect(() => {
+    const hasDataChanged = activeData?.lowerThird?.id !== prevActiveData?.lowerThird?.id || activeData?.theme.id !== prevActiveData?.theme.id;
 
     if (isLoading) return;
 
-    if (hasDataChanged) {
-      if (isVisible) {
-        // Animate out the old one
+    if (activeData) {
+      if (isVisible && hasDataChanged) {
+        // Data changed, animate out then in
         setAnimationClass("animate-lower-third-out");
         setTimeout(() => {
-          setPrevActiveData(activeData || null);
-          if (activeData) {
-            // Animate in the new one
-            setIsVisible(true);
-            setAnimationClass("animate-lower-third-in");
-          } else {
-            setIsVisible(false);
-          }
-        }, 500); // match out-animation duration
-      } else if (activeData) {
-        // Nothing is visible, just animate in the new one
+          setPrevActiveData(activeData);
+          setAnimationClass("animate-lower-third-in");
+        }, 500);
+      } else if (!isVisible) {
+        // Not visible, just animate in
         setPrevActiveData(activeData);
         setIsVisible(true);
         setAnimationClass("animate-lower-third-in");
       }
-    } else if (!activeData && isVisible) {
-      // Handle hiding the lower third
+    } else if (isVisible) {
+      // No active data, animate out
       setAnimationClass("animate-lower-third-out");
       setTimeout(() => {
         setIsVisible(false);
@@ -57,48 +62,96 @@ export function LowerThirdOverlay() {
   }, [activeData, prevActiveData, isVisible, isLoading]);
 
 
-  const displayData = isVisible ? prevActiveData : null;
+  const displayData = prevActiveData;
 
   if (!displayData) {
     return null;
   }
 
   const { lowerThird, theme } = displayData;
+  const IMAGE_WIDTH = 1920;
+  const IMAGE_HEIGHT = 180;
+  const MASK_HEIGHT = 120;
+  const TEXT_LEFT_PADDING = 220;
 
   return (
     <div
       className={cn(
-        "absolute bottom-[8vh] left-[5vw] w-[40vw] max-w-[700px] min-w-[400px]",
+        "absolute bottom-[8vh] left-0 w-[1920px] h-[180px]",
+        "transition-opacity duration-500",
         animationClass
       )}
     >
-      <div className="relative shadow-2xl rounded-lg overflow-hidden">
-        {theme.backgroundImageUrl && (
-          <Image
-            src={theme.backgroundImageUrl}
-            alt="Background"
-            fill
-            className="object-cover"
-            priority
-            data-ai-hint="abstract background"
-          />
+      <div className="relative w-full h-full">
+        {/* Layer 1: Top Image (z-30), left aligned */}
+        {theme.backgroundLayer1 && (
+          <div className="absolute inset-0 z-30 pointer-events-none">
+            <Image
+              src={theme.backgroundLayer1}
+              alt="Lower third top layer"
+              width={IMAGE_WIDTH}
+              height={IMAGE_HEIGHT}
+              className="absolute left-0 top-0"
+              unoptimized
+            />
+          </div>
         )}
-        <div
-          className="relative px-8 py-4"
-          style={{ backgroundColor: theme.backgroundColor }}
+
+        {/* Mask Container */}
+        <div 
+          className="absolute left-0 top-1/2 -translate-y-1/2 h-[120px] overflow-hidden rounded-r-full transition-[width] duration-500 ease-in-out"
+          style={{ 
+            width: `${maskWidth}px`, 
+            backgroundColor: theme.backgroundColor
+          }}
         >
-          <h1
+            {/* Layer 3: Background Image (z-10), left aligned, inside mask */}
+            {theme.backgroundLayer3 && (
+            <div className="absolute inset-0 z-10 pointer-events-none">
+                <Image
+                src={theme.backgroundLayer3}
+                alt="Lower third background layer"
+                width={IMAGE_WIDTH}
+                height={IMAGE_HEIGHT}
+                className="absolute left-0 top-1/2 -translate-y-1/2"
+                unoptimized
+                />
+            </div>
+            )}
+
+            {/* Layer 2: Middle Image (z-20), right aligned, inside mask */}
+            {theme.backgroundLayer2 && (
+            <div className="absolute inset-0 z-20 pointer-events-none">
+                <Image
+                src={theme.backgroundLayer2}
+                alt="Lower third middle layer"
+                width={IMAGE_WIDTH}
+                height={IMAGE_HEIGHT}
+                className="absolute right-0 top-1/2 -translate-y-1/2"
+                unoptimized
+                />
+            </div>
+            )}
+        </div>
+
+        {/* Text Content - used for sizing and display */}
+        <div
+            ref={textContentRef}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-40 h-[120px] flex flex-col justify-center whitespace-nowrap"
+            style={{ paddingLeft: `${TEXT_LEFT_PADDING}px`, paddingRight: '60px' }}
+        >
+            <h1
             className="font-headline text-5xl font-bold tracking-tight text-shadow"
             style={{ color: theme.titleColor }}
-          >
+            >
             {lowerThird.title}
-          </h1>
-          <p
+            </h1>
+            <p
             className="text-3xl font-medium text-shadow-sm mt-1"
             style={{ color: theme.subtitleColor }}
-          >
+            >
             {lowerThird.subtitle}
-          </p>
+            </p>
         </div>
       </div>
     </div>

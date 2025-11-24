@@ -9,7 +9,6 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 interface AppState {
   lowerThirds: LowerThird[];
   themes: Theme[];
-  activeThemeId: string | null;
   addLowerThird: (item: Omit<LowerThird, "id">) => void;
   updateLowerThird: (item: LowerThird) => void;
   removeLowerThird: (id: string) => void;
@@ -17,7 +16,6 @@ interface AppState {
   addTheme: (theme: Omit<Theme, "id">) => void;
   updateTheme: (theme: Theme) => void;
   removeTheme: (id: string) => void;
-  setActiveThemeId: (id: string | null) => void;
   getThemeById: (id: string | null) => Theme | undefined;
   getActiveTheme: () => Theme | undefined;
 }
@@ -31,15 +29,13 @@ const defaultThemes: Theme[] = [
     titleColor: "#000000",
     subtitleColor: "#333333",
     backgroundColor: "rgba(255, 255, 255, 0.8)",
-    backgroundImageUrl: "",
   },
   {
     id: "theme-2",
     name: "Default Dark",
     titleColor: "#FFFFFF",
     subtitleColor: "#CCCCCC",
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
-    backgroundImageUrl: "",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
   },
   {
     id: "theme-3",
@@ -47,7 +43,9 @@ const defaultThemes: Theme[] = [
     titleColor: "#FFFFFF",
     subtitleColor: "#FFFFFF",
     backgroundColor: "rgba(41, 171, 226, 0.9)",
-    backgroundImageUrl: PlaceHolderImages[0]?.imageUrl || "",
+    backgroundLayer1: PlaceHolderImages[0]?.imageUrl || "",
+    backgroundLayer2: PlaceHolderImages[1]?.imageUrl || "",
+    backgroundLayer3: PlaceHolderImages[2]?.imageUrl || "",
   },
 ];
 
@@ -138,10 +136,12 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const removeTheme = (id: string) => {
-    setThemes((prev) => prev.filter((t) => t.id !== id));
     if (activeThemeId === id) {
-        setActiveThemeId(themes[0]?.id || null);
+        // If the active theme is being deleted, try to set the first available theme as active.
+        const remainingThemes = themes.filter((t) => t.id !== id);
+        setActiveThemeId(remainingThemes[0]?.id || null);
     }
+    setThemes((prev) => prev.filter((t) => t.id !== id));
   };
   
   const getThemeById = (id: string | null) => {
@@ -156,7 +156,6 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
   const value = {
     lowerThirds,
     themes,
-    activeThemeId,
     addLowerThird,
     updateLowerThird,
     removeLowerThird,
@@ -164,9 +163,9 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
     addTheme,
     updateTheme,
     removeTheme,
-    setActiveThemeId,
     getThemeById,
     getActiveTheme,
+    setActiveThemeId: (id: string | null) => setActiveThemeId(id),
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

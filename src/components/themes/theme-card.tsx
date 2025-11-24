@@ -50,9 +50,27 @@ export function ThemeCard({
         <div
           className="relative aspect-video w-full overflow-hidden rounded-md border"
         >
-          {theme.backgroundImageUrl && (
-            <Image
-              src={theme.backgroundImageUrl}
+          {theme.backgroundLayer3 && (
+             <Image
+              src={theme.backgroundLayer3}
+              alt={theme.name}
+              fill
+              className="object-cover"
+              data-ai-hint="abstract background"
+            />
+          )}
+          {theme.backgroundLayer2 && (
+             <Image
+              src={theme.backgroundLayer2}
+              alt={theme.name}
+              fill
+              className="object-cover"
+              data-ai-hint="abstract background"
+            />
+          )}
+          {theme.backgroundLayer1 && (
+             <Image
+              src={theme.backgroundLayer1}
               alt={theme.name}
               fill
               className="object-cover"

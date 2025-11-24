@@ -39,7 +39,9 @@ const themeSchema = z.object({
   titleColor: z.string().regex(/^#([0-9a-f]{3}){1,2}$/i, "Must be a valid hex color."),
   subtitleColor: z.string().regex(/^#([0-9a-f]{3}){1,2}$/i, "Must be a valid hex color."),
   backgroundColor: z.string(), // Can be any CSS color
-  backgroundImageUrl: z.string().url("Must be a valid URL.").or(z.literal("")).optional(),
+  backgroundLayer1: z.string().url("Must be a valid URL.").or(z.literal("")).optional(),
+  backgroundLayer2: z.string().url("Must be a valid URL.").or(z.literal("")).optional(),
+  backgroundLayer3: z.string().url("Must be a valid URL.").or(z.literal("")).optional(),
 });
 
 type EditThemeDialogProps = {
@@ -59,8 +61,10 @@ export function EditThemeDialog({ open, onOpenChange, themeId }: EditThemeDialog
       name: "",
       titleColor: "#FFFFFF",
       subtitleColor: "#CCCCCC",
-      backgroundColor: "rgba(0, 0, 0, 0.7)",
-      backgroundImageUrl: "",
+      backgroundColor: "rgba(0, 0, 0, 0.0)",
+      backgroundLayer1: "",
+      backgroundLayer2: "",
+      backgroundLayer3: "",
     },
   });
 
@@ -71,15 +75,19 @@ export function EditThemeDialog({ open, onOpenChange, themeId }: EditThemeDialog
         titleColor: theme.titleColor,
         subtitleColor: theme.subtitleColor,
         backgroundColor: theme.backgroundColor,
-        backgroundImageUrl: theme.backgroundImageUrl || "",
+        backgroundLayer1: theme.backgroundLayer1 || "",
+        backgroundLayer2: theme.backgroundLayer2 || "",
+        backgroundLayer3: theme.backgroundLayer3 || "",
       });
     } else if (open && !isEditing) {
       form.reset({
         name: "",
         titleColor: "#FFFFFF",
         subtitleColor: "#CCCCCC",
-        backgroundColor: "rgba(0, 0, 0, 0.7)",
-        backgroundImageUrl: "",
+        backgroundColor: "rgba(0, 0, 0, 0.0)",
+        backgroundLayer1: "",
+        backgroundLayer2: "",
+        backgroundLayer3: "",
       });
     }
   }, [open, isEditing, theme, form]);
@@ -87,7 +95,9 @@ export function EditThemeDialog({ open, onOpenChange, themeId }: EditThemeDialog
   const onSubmit = (values: z.infer<typeof themeSchema>) => {
     const submissionValues = {
         ...values,
-        backgroundImageUrl: values.backgroundImageUrl === 'none' ? '' : values.backgroundImageUrl,
+        backgroundLayer1: values.backgroundLayer1 === 'none' ? undefined : values.backgroundLayer1,
+        backgroundLayer2: values.backgroundLayer2 === 'none' ? undefined : values.backgroundLayer2,
+        backgroundLayer3: values.backgroundLayer3 === 'none' ? undefined : values.backgroundLayer3,
     };
 
     if (isEditing && theme) {
@@ -100,7 +110,7 @@ export function EditThemeDialog({ open, onOpenChange, themeId }: EditThemeDialog
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-headline">{isEditing ? "Edit Theme" : "Create New Theme"}</DialogTitle>
           <DialogDescription>
@@ -155,7 +165,7 @@ export function EditThemeDialog({ open, onOpenChange, themeId }: EditThemeDialog
                 name="backgroundColor"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Background Color</FormLabel>
+                    <FormLabel>Mask Background Color</FormLabel>
                     <FormControl>
                        <Input placeholder="rgba(0,0,0,0.5)" {...field} />
                     </FormControl>
@@ -165,14 +175,60 @@ export function EditThemeDialog({ open, onOpenChange, themeId }: EditThemeDialog
               />
              <FormField
                 control={form.control}
-                name="backgroundImageUrl"
+                name="backgroundLayer1"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Background Image</FormLabel>
+                    <FormLabel>Layer 1 (Top, Left)</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || "none"}>
                         <FormControl>
                         <SelectTrigger>
-                            <SelectValue placeholder="Select a background or leave empty" />
+                            <SelectValue placeholder="Select an image" />
+                        </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            <SelectItem value="none">None</SelectItem>
+                            {PlaceHolderImages.map(img => (
+                                <SelectItem key={img.id} value={img.imageUrl}>{img.description}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="backgroundLayer2"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Layer 2 (Middle, Right, Masked)</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || "none"}>
+                        <FormControl>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select an image" />
+                        </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            <SelectItem value="none">None</SelectItem>
+                            {PlaceHolderImages.map(img => (
+                                <SelectItem key={img.id} value={img.imageUrl}>{img.description}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="backgroundLayer3"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Layer 3 (Bottom, Left, Masked)</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || "none"}>
+                        <FormControl>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select an image" />
                         </SelectTrigger>
                         </FormControl>
                         <SelectContent>
