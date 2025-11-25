@@ -9,6 +9,7 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 interface AppState {
   lowerThirds: LowerThird[];
   themes: Theme[];
+  activeThemeId: string | null;
   addLowerThird: (item: Omit<LowerThird, "id">) => void;
   updateLowerThird: (item: LowerThird) => void;
   removeLowerThird: (id: string) => void;
@@ -18,6 +19,7 @@ interface AppState {
   removeTheme: (id: string) => void;
   getThemeById: (id: string | null) => Theme | undefined;
   getActiveTheme: () => Theme | undefined;
+  setActiveThemeId: (id: string | null) => void;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -156,6 +158,7 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
   const value = {
     lowerThirds,
     themes,
+    activeThemeId,
     addLowerThird,
     updateLowerThird,
     removeLowerThird,
@@ -165,7 +168,7 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
     removeTheme,
     getThemeById,
     getActiveTheme,
-    setActiveThemeId: (id: string | null) => setActiveThemeId(id),
+    setActiveThemeId,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

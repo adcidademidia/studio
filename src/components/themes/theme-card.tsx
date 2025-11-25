@@ -21,7 +21,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { cn } from "@/lib/utils";
+import { cn, convertGoogleDriveLink } from "@/lib/utils";
 
 interface ThemeCardProps {
   theme: Theme;
@@ -38,6 +38,11 @@ export function ThemeCard({
   onSetActive,
   onDelete,
 }: ThemeCardProps) {
+
+  const layer1 = convertGoogleDriveLink(theme.backgroundLayer1);
+  const layer2 = convertGoogleDriveLink(theme.backgroundLayer2);
+  const layer3 = convertGoogleDriveLink(theme.backgroundLayer3);
+
   return (
     <Card className={cn("flex flex-col transition-all", isActive && "border-primary ring-2 ring-primary")}>
       <CardHeader>
@@ -50,27 +55,27 @@ export function ThemeCard({
         <div
           className="relative aspect-video w-full overflow-hidden rounded-md border"
         >
-          {theme.backgroundLayer3 && (
+          {layer3 && (
              <Image
-              src={theme.backgroundLayer3}
+              src={layer3}
               alt={theme.name}
               fill
               className="object-cover"
               data-ai-hint="abstract background"
             />
           )}
-          {theme.backgroundLayer2 && (
+          {layer2 && (
              <Image
-              src={theme.backgroundLayer2}
+              src={layer2}
               alt={theme.name}
               fill
               className="object-cover"
               data-ai-hint="abstract background"
             />
           )}
-          {theme.backgroundLayer1 && (
+          {layer1 && (
              <Image
-              src={theme.backgroundLayer1}
+              src={layer1}
               alt={theme.name}
               fill
               className="object-cover"

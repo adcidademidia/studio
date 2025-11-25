@@ -5,7 +5,7 @@ import Image from "next/image";
 import { doc } from 'firebase/firestore';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import type { ActiveData } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn, convertGoogleDriveLink } from "@/lib/utils";
 import { ACTIVE_LOWER_THIRD_ID } from "@/lib/constants";
 
 export function LowerThirdOverlay() {
@@ -69,6 +69,10 @@ export function LowerThirdOverlay() {
   }
 
   const { lowerThird, theme } = displayData;
+  const layer1 = convertGoogleDriveLink(theme.backgroundLayer1);
+  const layer2 = convertGoogleDriveLink(theme.backgroundLayer2);
+  const layer3 = convertGoogleDriveLink(theme.backgroundLayer3);
+
   const IMAGE_WIDTH = 1920;
   const IMAGE_HEIGHT = 180;
   const MASK_HEIGHT = 120;
@@ -84,10 +88,10 @@ export function LowerThirdOverlay() {
     >
       <div className="relative w-full h-full">
         {/* Layer 1: Top Image (z-30), left aligned */}
-        {theme.backgroundLayer1 && (
+        {layer1 && (
           <div className="absolute inset-0 z-30 pointer-events-none">
             <Image
-              src={theme.backgroundLayer1}
+              src={layer1}
               alt="Lower third top layer"
               width={IMAGE_WIDTH}
               height={IMAGE_HEIGHT}
@@ -106,10 +110,10 @@ export function LowerThirdOverlay() {
           }}
         >
             {/* Layer 3: Background Image (z-10), left aligned, inside mask */}
-            {theme.backgroundLayer3 && (
+            {layer3 && (
             <div className="absolute inset-0 z-10 pointer-events-none">
                 <Image
-                src={theme.backgroundLayer3}
+                src={layer3}
                 alt="Lower third background layer"
                 width={IMAGE_WIDTH}
                 height={IMAGE_HEIGHT}
@@ -120,10 +124,10 @@ export function LowerThirdOverlay() {
             )}
 
             {/* Layer 2: Middle Image (z-20), right aligned, inside mask */}
-            {theme.backgroundLayer2 && (
+            {layer2 && (
             <div className="absolute inset-0 z-20 pointer-events-none">
                 <Image
-                src={theme.backgroundLayer2}
+                src={layer2}
                 alt="Lower third middle layer"
                 width={IMAGE_WIDTH}
                 height={IMAGE_HEIGHT}

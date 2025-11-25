@@ -11,9 +11,9 @@ export type Theme = {
   titleColor: string;
   subtitleColor: string;
   backgroundColor: string;
-  backgroundLayer1?: string; // Image with highest z-index, left-aligned
-  backgroundLayer2?: string; // Image with mid z-index, right-aligned, masked
-  backgroundLayer3?: string; // Image with lowest z-index, left-aligned, masked
+  backgroundLayer1?: string; // Google Drive Link or direct image URL
+  backgroundLayer2?: string; // Google Drive Link or direct image URL
+  backgroundLayer3?: string; // Google Drive Link or direct image URL
 };
 
 export type ActiveData = {

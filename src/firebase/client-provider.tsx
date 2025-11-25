@@ -16,7 +16,7 @@ export function FirebaseClientProvider({ children }: FirebaseClientProviderProps
 
   useEffect(() => {
     // Automatically sign in the user anonymously when the app loads.
-    // This is necessary for Firestore/Storage security rules that require authentication.
+    // This is necessary for Firestore security rules that require authentication.
     const signIn = async () => {
       if (firebaseServices.auth.currentUser) return; // Already signed in
       try {
@@ -34,7 +34,6 @@ export function FirebaseClientProvider({ children }: FirebaseClientProviderProps
       firebaseApp={firebaseServices.firebaseApp}
       auth={firebaseServices.auth}
       firestore={firebaseServices.firestore}
-      storage={firebaseServices.storage}
     >
       {children}
     </FirebaseProvider>

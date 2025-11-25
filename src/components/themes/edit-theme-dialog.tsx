@@ -24,16 +24,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ImageUploader } from "./image-uploader";
 
 const themeSchema = z.object({
   name: z.string().min(1, "Theme name is required."),
   titleColor: z.string().regex(/^#([0-9a-f]{3}){1,2}$/i, "Must be a valid hex color."),
   subtitleColor: z.string().regex(/^#([0-9a-f]{3}){1,2}$/i, "Must be a valid hex color."),
   backgroundColor: z.string(), // Can be any CSS color
-  backgroundLayer1: z.string().url("Must be a valid URL.").or(z.literal("")).optional(),
-  backgroundLayer2: z.string().url("Must be a valid URL.").or(z.literal("")).optional(),
-  backgroundLayer3: z.string().url("Must be a valid URL.").or(z.literal("")).optional(),
+  backgroundLayer1: z.string().optional(),
+  backgroundLayer2: z.string().optional(),
+  backgroundLayer3: z.string().optional(),
 });
 
 type EditThemeDialogProps = {
@@ -174,9 +173,9 @@ export function EditThemeDialog({ open, onOpenChange, themeId }: EditThemeDialog
                         name="backgroundLayer1"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Layer 1 (Top, Left)</FormLabel>
+                            <FormLabel>Layer 1 Image URL (Top, Left)</FormLabel>
                             <FormControl>
-                                <ImageUploader folder="themes/layer1" value={field.value} onChange={field.onChange} />
+                                <Input placeholder="Paste Google Drive link or image URL" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -190,9 +189,9 @@ export function EditThemeDialog({ open, onOpenChange, themeId }: EditThemeDialog
                     name="backgroundLayer2"
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Layer 2 (Middle, Right, Masked)</FormLabel>
+                        <FormLabel>Layer 2 Image URL (Middle, Right, Masked)</FormLabel>
                         <FormControl>
-                             <ImageUploader folder="themes/layer2" value={field.value} onChange={field.onChange} />
+                             <Input placeholder="Paste Google Drive link or image URL" {...field} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -203,9 +202,9 @@ export function EditThemeDialog({ open, onOpenChange, themeId }: EditThemeDialog
                     name="backgroundLayer3"
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Layer 3 (Bottom, Left, Masked)</FormLabel>
+                        <FormLabel>Layer 3 Image URL (Bottom, Left, Masked)</FormLabel>
                         <FormControl>
-                            <ImageUploader folder="themes/layer3" value={field.value} onChange={field.onChange} />
+                            <Input placeholder="Paste Google Drive link or image URL" {...field} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
