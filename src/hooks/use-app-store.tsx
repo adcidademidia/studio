@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { ReactNode } from "react";
@@ -7,6 +8,7 @@ import { APP_STORAGE_KEY } from "@/lib/constants";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 interface AppState {
+  isInitialized: boolean;
   lowerThirds: LowerThird[];
   themes: Theme[];
   activeThemeId: string | null;
@@ -156,6 +158,7 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const value = {
+    isInitialized,
     lowerThirds,
     themes,
     activeThemeId,
@@ -171,6 +174,10 @@ export const AppStoreProvider = ({ children }: { children: ReactNode }) => {
     setActiveThemeId,
   };
 
+  if (!isInitialized) {
+    return <AppContext.Provider value={{...value, lowerThirds: [], themes: []}}>{children}</AppContext.Provider>;
+  }
+
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 
@@ -181,3 +188,5 @@ export const useAppStore = () => {
   }
   return context;
 };
+
+    
