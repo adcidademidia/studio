@@ -10,16 +10,12 @@ import { ACTIVE_LOWER_THIRD_ID } from "@/lib/constants";
 
 export function LowerThirdOverlay() {
   const firestore = useFirestore();
-  const [prevActiveData, setPrevActiveData] = useState<ActiveData | null>(null);
 
   const activeStateRef = useMemoFirebase(
     () => firestore ? doc(firestore, 'activeState', ACTIVE_LOWER_THIRD_ID) : null,
     [firestore]
   );
-  const { data: activeData, isLoading } = useDoc<ActiveData>(activeStateRef);
-
-  const [isVisible, setIsVisible] = useState(false);
-  const [animationClass, setAnimationClass] = useState("opacity-0");
+  const { data: activeData } = useDoc<ActiveData>(activeStateRef);
 
   const [maskWidth, setMaskWidth] = useState(0);
   const textContentRef = useRef<HTMLDivElement>(null);
@@ -30,52 +26,21 @@ export function LowerThirdOverlay() {
         const textWidth = textContentRef.current.scrollWidth;
         setMaskWidth(textWidth);
     }
-  }, [prevActiveData]); // Recalculate on data change
+  }, [activeData]); // Recalculate on data change
 
-  useEffect(() => {
-    const hasDataChanged = activeData?.lowerThird?.id !== prevActiveData?.lowerThird?.id || activeData?.theme.id !== prevActiveData?.theme.id;
+  const isVisible = !!activeData;
 
-    if (isLoading) return;
-
-    if (activeData) {
-      if (isVisible && hasDataChanged) {
-        // Data changed, animate out then in
-        setAnimationClass("animate-lower-third-out");
-        setTimeout(() => {
-          setPrevActiveData(activeData);
-          setAnimationClass("animate-lower-third-in");
-        }, 500);
-      } else if (!isVisible) {
-        // Not visible, just animate in
-        setPrevActiveData(activeData);
-        setIsVisible(true);
-        setAnimationClass("animate-lower-third-in");
-      }
-    } else if (isVisible) {
-      // No active data, animate out
-      setAnimationClass("animate-lower-third-out");
-      setTimeout(() => {
-        setIsVisible(false);
-        setPrevActiveData(null);
-      }, 500);
-    }
-  }, [activeData, prevActiveData, isVisible, isLoading]);
-
-
-  const displayData = prevActiveData;
-
-  if (!displayData) {
+  if (!activeData) {
     return null;
   }
 
-  const { lowerThird, theme } = displayData;
+  const { lowerThird, theme } = activeData;
   const layer1 = convertGoogleDriveLink(theme.backgroundLayer1);
   const layer2 = convertGoogleDriveLink(theme.backgroundLayer2);
   const layer3 = convertGoogleDriveLink(theme.backgroundLayer3);
 
   const IMAGE_WIDTH = 1920;
   const IMAGE_HEIGHT = 180;
-  const MASK_HEIGHT = 120;
   const TEXT_LEFT_PADDING = 220;
 
   return (
@@ -83,7 +48,7 @@ export function LowerThirdOverlay() {
       className={cn(
         "absolute bottom-[8vh] left-0 w-[1920px] h-[180px]",
         "transition-opacity duration-500",
-        animationClass
+        isVisible ? "opacity-100" : "opacity-0"
       )}
     >
       <div className="relative w-full h-full">
