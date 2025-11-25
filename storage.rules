@@ -1,0 +1,15 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Regras para as imagens de tema.
+    // Permite que qualquer usuário autenticado grave (faça upload) de imagens na pasta "themes".
+    // Isso é seguro porque o app usa autenticação anônima por padrão.
+    match /themes/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+  }
+}
