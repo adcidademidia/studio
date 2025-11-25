@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useRef } from "react";
 import Image from "next/image";
 import { doc } from 'firebase/firestore';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
@@ -17,16 +17,7 @@ export function LowerThirdOverlay() {
   );
   const { data: activeData } = useDoc<ActiveData>(activeStateRef);
 
-  const [maskWidth, setMaskWidth] = useState(0);
   const textContentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (textContentRef.current) {
-        // Calculate width of text content + padding and set mask width
-        const textWidth = textContentRef.current.scrollWidth;
-        setMaskWidth(textWidth);
-    }
-  }, [activeData]); // Recalculate on data change
 
   const isVisible = !!activeData;
 
@@ -68,59 +59,61 @@ export function LowerThirdOverlay() {
 
         {/* Mask Container */}
         <div 
-          className="absolute left-0 top-1/2 -translate-y-1/2 h-[120px] overflow-hidden rounded-r-full transition-[width] duration-500 ease-in-out"
+          className="absolute left-0 top-1/2 -translate-y-1/2 h-[120px] overflow-hidden rounded-r-full"
           style={{ 
-            width: `${maskWidth}px`, 
+            width: 'fit-content', // Use CSS to determine width
             backgroundColor: theme.backgroundColor
           }}
         >
+          <div className="relative w-full h-full">
             {/* Layer 3: Background Image (z-10), left aligned, inside mask */}
             {layer3 && (
-            <div className="absolute inset-0 z-10 pointer-events-none">
-                <Image
-                src={layer3}
-                alt="Lower third background layer"
-                width={IMAGE_WIDTH}
-                height={IMAGE_HEIGHT}
-                className="absolute left-0 top-1/2 -translate-y-1/2"
-                unoptimized
-                />
-            </div>
+              <div className="absolute inset-0 z-10 pointer-events-none">
+                  <Image
+                  src={layer3}
+                  alt="Lower third background layer"
+                  width={IMAGE_WIDTH}
+                  height={IMAGE_HEIGHT}
+                  className="absolute left-0 top-1/2 -translate-y-1/2"
+                  unoptimized
+                  />
+              </div>
             )}
 
             {/* Layer 2: Middle Image (z-20), right aligned, inside mask */}
             {layer2 && (
-            <div className="absolute inset-0 z-20 pointer-events-none">
-                <Image
-                src={layer2}
-                alt="Lower third middle layer"
-                width={IMAGE_WIDTH}
-                height={IMAGE_HEIGHT}
-                className="absolute right-0 top-1/2 -translate-y-1/2"
-                unoptimized
-                />
-            </div>
+              <div className="absolute inset-0 z-20 pointer-events-none">
+                  <Image
+                  src={layer2}
+                  alt="Lower third middle layer"
+                  width={IMAGE_WIDTH}
+                  height={IMAGE_HEIGHT}
+                  className="absolute right-0 top-1/2 -translate-y-1/2"
+                  unoptimized
+                  />
+              </div>
             )}
-        </div>
 
-        {/* Text Content - used for sizing and display */}
-        <div
-            ref={textContentRef}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-40 h-[120px] flex flex-col justify-center whitespace-nowrap"
-            style={{ paddingLeft: `${TEXT_LEFT_PADDING}px`, paddingRight: '60px' }}
-        >
-            <h1
-            className="font-headline text-5xl font-bold tracking-tight text-shadow"
-            style={{ color: theme.titleColor }}
+            {/* Text Content - now inside the sizing container */}
+            <div
+                ref={textContentRef}
+                className="relative z-40 h-[120px] flex flex-col justify-center whitespace-nowrap"
+                style={{ paddingLeft: `${TEXT_LEFT_PADDING}px`, paddingRight: '60px' }}
             >
-            {lowerThird.title}
-            </h1>
-            <p
-            className="text-3xl font-medium text-shadow-sm mt-1"
-            style={{ color: theme.subtitleColor }}
-            >
-            {lowerThird.subtitle}
-            </p>
+                <h1
+                className="font-headline text-5xl font-bold tracking-tight text-shadow"
+                style={{ color: theme.titleColor }}
+                >
+                {lowerThird.title}
+                </h1>
+                <p
+                className="text-3xl font-medium text-shadow-sm mt-1"
+                style={{ color: theme.subtitleColor }}
+                >
+                {lowerThird.subtitle}
+                </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
