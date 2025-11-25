@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRef } from "react";
@@ -52,7 +53,6 @@ export function LowerThirdOverlay() {
               width={IMAGE_WIDTH}
               height={IMAGE_HEIGHT}
               className="absolute left-0 top-0"
-              unoptimized
             />
           </div>
         )}
@@ -75,7 +75,6 @@ export function LowerThirdOverlay() {
                   width={IMAGE_WIDTH}
                   height={IMAGE_HEIGHT}
                   className="absolute left-0 top-1/2 -translate-y-1/2"
-                  unoptimized
                   />
               </div>
             )}
@@ -89,7 +88,6 @@ export function LowerThirdOverlay() {
                   width={IMAGE_WIDTH}
                   height={IMAGE_HEIGHT}
                   className="absolute right-0 top-1/2 -translate-y-1/2"
-                  unoptimized
                   />
               </div>
             )}
