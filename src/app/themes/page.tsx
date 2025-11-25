@@ -10,10 +10,13 @@ import { EditThemeDialog } from "@/components/themes/edit-theme-dialog";
 import { ThemeList } from "@/components/themes/theme-list";
 
 export default function ThemesPage() {
-  const { themes, activeThemeId, setActiveThemeId, removeTheme, getActiveTheme } = useAppStore();
+  const { themes, activeThemeId, setActiveThemeId, removeTheme, isInitialized } = useAppStore();
   const [editTheme, setEditTheme] = React.useState<string | null | "new">(null);
   
-  const activeTheme = getActiveTheme();
+  if (!isInitialized) {
+    // Render nothing or a loading spinner on the server and during initial client render
+    return null;
+  }
 
   return (
     <MainLayout>

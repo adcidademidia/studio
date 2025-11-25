@@ -9,11 +9,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddLowerThirdDialog } from "@/components/lower-thirds/add-lower-third-dialog";
 import { ImportPlanningCenterDialog } from "@/components/lower-thirds/import-planning-center-dialog";
 import { LowerThirdsTabContent } from "@/components/lower-thirds/lower-thirds-tab-content";
+import { useAppStore } from "@/hooks/use-app-store";
 
 export default function Home() {
   const [addPersonOpen, setAddPersonOpen] = React.useState(false);
   const [addMusicOpen, setAddMusicOpen] = React.useState(false);
   const [importMusicOpen, setImportMusicOpen] = React.useState(false);
+  const { isInitialized } = useAppStore();
+
+  if (!isInitialized) {
+    // Render nothing or a loading spinner on the server and during initial client render
+    return null;
+  }
 
   return (
     <MainLayout>
